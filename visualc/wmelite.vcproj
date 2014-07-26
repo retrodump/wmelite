@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="dep\sdl\include;dep\zlib\include;dep\bass\include;dep\freetype\include;dep\FreeImage\include;dep\libtheoraplayer\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;USE_BASS_FX"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="SDL2.lib SDL2main.lib bass.lib bass_fx.lib zlib.lib freetype2311_D.lib FreeImage.lib libtheoraplayer.lib"
+				AdditionalDependencies="SDL2.lib SDL2main.lib bass.lib zlib.lib freetype2311_D.lib FreeImage.lib libtheoraplayer.lib"
 				OutputFile="$(InputDir)\..\bin\$(IntDir)\$(ProjectName).exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="dep\sdl\lib;dep\zlib\lib;dep\bass\lib;dep\freetype\lib;dep\FreeImage\lib;dep\libtheoraplayer\lib"
@@ -123,7 +123,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="dep\sdl\include;dep\zlib\include;dep\bass\include;dep\freetype\include;dep\FreeImage\include;dep\libtheoraplayer\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;THEORAVIDEO_STATIC;USE_BASS_FX"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;THEORAVIDEO_STATIC"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -141,8 +141,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="SDL2.lib SDL2main.lib bass.lib bass_fx.lib zlib.lib freetype2311ST.lib FreeImage.lib libtheoraplayer_static.lib  libogg.lib libtheora.lib libvorbis.lib "
-				OutputFile="$(InputDir)\..\bin\$(IntDir)\wme_D3D9.exe"
+				AdditionalDependencies="SDL2.lib SDL2main.lib bass.lib zlib.lib freetype2311ST.lib FreeImage.lib libtheoraplayer_static.lib  libogg.lib libtheora.lib libvorbis.lib "
+				OutputFile="$(InputDir)\..\bin\$(IntDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="dep\sdl\lib;dep\zlib\lib;dep\bass\lib;dep\freetype\lib;dep\FreeImage\lib;dep\libtheoraplayer\lib"
 				IgnoreDefaultLibraryNames=""
