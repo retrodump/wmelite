@@ -183,4 +183,22 @@ public class WMELiteFunctions {
 			}
 		}
 	}
+	
+	public int advertisementPrepare(String key, int number)
+	{
+		System.out.println("Query Advertisement SDK to prepare ads/check if ads prepared. Key=" + key + ",number=" + number + ".");
+		
+		// place appropriate code here
+		
+		return 0;
+	}
+	
+	public int advertisementShow(String key, int number)
+	{
+		System.out.println("Instruct Advertisement SDK to show an ad. Key=" + key + ",number=" + number + ".");
+		
+		// place appropriate code here
+		
+		return 0;
+	}
 }

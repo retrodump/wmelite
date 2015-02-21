@@ -334,3 +334,38 @@ void android_showURLInBrowser(char *URL)
 
   (*env)->DeleteLocalRef(env, urlString);
 }
+
+int android_advertisementPrepare(char *key, int number)
+{
+	  JNIEnv *env = localEnv;
+	  jclass cls = (*env)->GetObjectClass(env, callbackObject);
+	  jmethodID callbackID = (*env)->GetMethodID(env, cls, "advertisementPrepare", "(Ljava/lang/String;I)I");
+
+	  jstring keyString = (*env)->NewStringUTF(env, key);
+	  jint numberVal = (jint) number;
+	  jint ret;
+
+	  ret = (*env)->CallIntMethod(env, callbackObject, callbackID, keyString, numberVal);
+
+	  (*env)->DeleteLocalRef(env, keyString);
+
+	  return (int) ret;
+}
+
+int android_advertisementShow(char *key, int number)
+{
+	  JNIEnv *env = localEnv;
+	  jclass cls = (*env)->GetObjectClass(env, callbackObject);
+	  jmethodID callbackID = (*env)->GetMethodID(env, cls, "advertisementShow", "(Ljava/lang/String;I)I");
+
+	  jstring keyString = (*env)->NewStringUTF(env, key);
+	  jint numberVal = (jint) number;
+	  jint ret;
+
+	  ret = (*env)->CallIntMethod(env, callbackObject, callbackID, keyString, numberVal);
+
+	  (*env)->DeleteLocalRef(env, keyString);
+
+	  return (int) ret;
+}
+
