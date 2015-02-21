@@ -2244,6 +2244,45 @@ HRESULT CBGame::ScCallMethod(CScScript* Script, CScStack *Stack, CScStack *ThisS
     return S_OK;
   }
 
+	  //////////////////////////////////////////////////////////////////////////
+	  // advertisementPrepare
+	  //////////////////////////////////////////////////////////////////////////
+	  else if(strcmp(Name, "advertisementPrepare")==0)
+	  {
+	    Stack->CorrectParams(2);
+
+	    char* key = Stack->Pop()->GetString();
+	    int number = Stack->Pop()->GetInt();
+	    int ret = 0;
+#ifdef __ANDROID__
+	    ret = android_advertisementPrepare(key, number);
+#endif
+	    Stack->PushInt(ret);
+
+	    return S_OK;
+	  }
+
+	  //////////////////////////////////////////////////////////////////////////
+	  // advertisementShow
+	  //////////////////////////////////////////////////////////////////////////
+	  else if(strcmp(Name, "advertisementShow")==0)
+	  {
+	    Stack->CorrectParams(2);
+
+	    char* key = Stack->Pop()->GetString();
+	    int number = Stack->Pop()->GetInt();
+	    int ret = 0;
+#ifdef __ANDROID__
+	    ret = android_advertisementShow(key, number);
+#endif
+	    Stack->PushInt(ret);
+
+	    return S_OK;
+	  }
+
+
+
+
 	else return CBObject::ScCallMethod(Script, Stack, ThisStack, Name);
 }
 

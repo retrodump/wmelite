@@ -32,6 +32,10 @@ void android_getUTFString(char *inputString, char *encoding, char *buffer, int *
 
 void android_showURLInBrowser(char *URL);
 
+int android_advertisementPrepare(char *key, int number);
+
+int android_advertisementShow(char *key, int number);
+
 #ifdef __cplusplus
 }
 #endif
