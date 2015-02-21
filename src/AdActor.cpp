@@ -1081,6 +1081,7 @@ HRESULT CAdActor::ScCallMethod(CScScript* Script, CScStack *Stack, CScStack *Thi
 	{
 		Stack->CorrectParams(1);
 		m_StopOnBlocked = Stack->Pop()->GetBool();
+		Stack->PushNULL();
 		return S_OK;
 	}
 
