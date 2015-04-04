@@ -31,11 +31,18 @@ LOCAL_MODULE := main
 
 SDL_PATH := ../../../dependencies/SDL/jni/
 
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SDL_PATH)/include $(LOCAL_PATH)/$(SDL_PATH)/src/core/android/ ../dependencies/bass/ ../dependencies/libfreetype-android/jni/include/ ../dependencies/FreeImage3154/jni/Source/ ../dependencies/boost-1_53/build/include/boost-1_53/ ../src/
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SDL_PATH)/include \
+$(LOCAL_PATH)/$(SDL_PATH)/src/core/android/ \
+$(LOCAL_PATH)/$(SDL_PATH)/src/ \
+$(LOCAL_PATH)/../../../dependencies/bass/ \
+$(LOCAL_PATH)/../../../dependencies/libfreetype-android/jni/include/ \
+$(LOCAL_PATH)/../../../dependencies/FreeImage3154/jni/Source/ \
+$(LOCAL_PATH)/../../../dependencies/boost-1_53/build/include/boost-1_53/ \
+$(LOCAL_PATH)/../../../src/
 
 LOCAL_CPPFLAGS += -fexceptions -frtti -Wno-write-strings -Wno-conversion-null 
 
-LOCAL_ARM_MODE := arm
+# LOCAL_ARM_MODE := arm
 
 # Add your application source files here...
 LOCAL_SRC_FILES := ../../../src/android/SDL_android_main.c \
@@ -163,7 +170,7 @@ LOCAL_SRC_FILES := ../../../src/android/SDL_android_main.c \
 
 LOCAL_SHARED_LIBRARIES := SDL2 freeimage bass
 LOCAL_STATIC_LIBRARIES := freetype
-LOCAL_LDLIBS := -lGLESv1_CM -llog -landroid
+LOCAL_LDLIBS := -lGLESv1_CM -llog -landroid -lz
 
 include $(BUILD_SHARED_LIBRARY)
 
