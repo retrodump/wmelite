@@ -6,8 +6,6 @@
 /* Include the SDL main definition header */
 #include "SDL_main.h"
 
-#include "android/android.h"
-
 /*******************************************************************************
                  Functions called by JNI
 *******************************************************************************/
@@ -21,8 +19,6 @@ int Java_org_libsdl_app_SDLActivity_nativeInit(JNIEnv* env, jclass cls, jobject 
 {
     /* This interface could expand with ABI negotiation, calbacks, etc. */
     SDL_Android_Init(env, cls);
-
-    android_setLocalEnv(env);
 
     SDL_SetMainReady();
 
