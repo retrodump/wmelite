@@ -1,3 +1,4 @@
 #!/bin/bash
-ndk-build NDK_DEBUG=1
+ndk-build clean && ndk-build -j8
+
 
