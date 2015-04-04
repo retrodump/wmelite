@@ -317,10 +317,10 @@ void CBPlatform::HandleEvent(SDL_Event* event)
 			break;
 		case SDL_WINDOWEVENT_FOCUS_LOST:
 		case SDL_WINDOWEVENT_MINIMIZED:
-#if !defined(__IPHONEOS__) && !defined(__ANDROID__)
+// #if !defined(__IPHONEOS__) && !defined(__ANDROID__)
 			if (Game) Game->OnActivate(false, false);
 			SDL_ShowCursor(SDL_ENABLE);
-#endif
+// #endif
 			break;
 
 		case SDL_WINDOWEVENT_CLOSE:
