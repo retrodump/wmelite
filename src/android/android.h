@@ -10,8 +10,6 @@ extern "C" {
 
 void Java_org_deadcode_wmelite_WMELiteFunctions_nativeInit(JNIEnv* env, jobject o, jobject assetMgr);
 
-void android_setLocalEnv(JNIEnv *env);
-
 void android_getLogFileDirectory(char *buffer, int length);
 
 void android_getPrivateFilesPath(char *buffer, int length);
