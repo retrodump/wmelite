@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "FreeImage.h"
 #include "MathUtil.h"
 #include "StringUtil.h"
+#include <math.h>
 
 //////////////////////////////////////////////////////////////////////////
 CBRenderSDL::CBRenderSDL(CBGame* inGame) : CBRenderer(inGame)
@@ -58,7 +59,9 @@ HRESULT CBRenderSDL::InitRenderer(int width, int height, bool windowed, float up
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) return E_FAIL;
 	
 	const SDL_DisplayMode* current = NULL;
-	SDL_DisplayMode tmpResolution;
+
+	// for searching matching resolution, always remember "best" pick
+	SDL_DisplayMode bestResolution;
 	
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 0);
 	SDL_GL_SetAttribute(SDL_GL_RETAINED_BACKING, 1);
@@ -70,6 +73,10 @@ HRESULT CBRenderSDL::InitRenderer(int width, int height, bool windowed, float up
 	{
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	}
+
+	int deviceNumber = Game->m_Registry->ReadInt("Video", "DeviceNumber", 0);
+
+	Game->LOG(0, "Current video device no=%d, max=%d (- 1).", deviceNumber, SDL_GetNumVideoDisplays());
 
 	m_Width = width;
 	m_Height = height;
@@ -86,60 +93,74 @@ HRESULT CBRenderSDL::InitRenderer(int width, int height, bool windowed, float up
 	m_RealWidth = 480;
 	m_RealHeight = 320;
 
-	int numModes = SDL_GetNumDisplayModes(0);
+	int numModes = SDL_GetNumDisplayModes(deviceNumber);
 	for (int i = 0; i < numModes; i++)
 	{
-		SDL_GetDisplayMode(0, i, &tmpResolution);
+		SDL_GetDisplayMode(deviceNumber, i, &bestResolution);
 
-		if (tmpResolution.w > tmpResolution.h)
+		if (bestResolution.w > bestResolution.h)
 		{
-			m_RealWidth = tmpResolution.w;
-			m_RealHeight = tmpResolution.h;
-			current = &tmpResolution;
+			m_RealWidth = bestResolution.w;
+			m_RealHeight = bestResolution.h;
+			current = &bestResolution;
 			break;
 		}
 	}	
 #else
 	// windows/linux: search a resolution with same screen width/height ratio
-	// stolen from Jan Kavan (wmelite julia branch)
+	// inspired by Jan Kavan (wmelite julia branch)
 	SDL_DisplayMode testResolution;
 
-	SDL_GetCurrentDisplayMode(0,&tmpResolution);
+	SDL_GetCurrentDisplayMode(deviceNumber, &bestResolution);
 
-	float gameRatio = width / height;
-	float screenRatio = tmpResolution.w / tmpResolution.h;
-	
-	if (gameRatio == screenRatio)
+	// compute ratios precisely
+	float gameRatio = (float)width / (float)height;
+	float bestRatio = (float)bestResolution.w / (float)bestResolution.h;
+	float bestRatioDiff = gameRatio - bestRatio;
+
+	Game->LOG(0, "Game dimension=%dx%d, ratio=%.2f.", width, height, gameRatio);
+
+	Game->LOG(0, "Starting best screen dimension=%dx%d, ratio=%.2f, ratio diff=%.2f.", bestResolution.w, bestResolution.h, bestRatio, bestRatioDiff);
+
+	if (Game->m_Registry->ReadBool("Video", "DesktopResolution", false) == false)
 	{
-		current = &tmpResolution;
-		m_RealWidth = width;
-		m_RealHeight = height;
-	}
-	else
-	{
-		for (int i=0;i<SDL_GetNumDisplayModes(0); i++)
+		// now iterate over all modes of this screen and pick the best one
+		for (int i = 0; i < SDL_GetNumDisplayModes(deviceNumber); i++)
 		{
-			if (SDL_GetDisplayMode(0,i,&testResolution) == 0)
+			if (SDL_GetDisplayMode(deviceNumber, i, &testResolution) == 0)
 			{
-				 float tmpRatio = testResolution.w / testResolution.h;
-				 if (tmpRatio == screenRatio)
+				 float testRatio = (float)testResolution.w / (float)testResolution.h;
+				 float testRatioDiff = gameRatio - testRatio;
+
+				 Game->LOG(0, "Other screen dimension=%dx%d, ratio=%.2f, ratio diff=%.2f.", testResolution.w, testResolution.h, testRatio, testRatioDiff);
+
+				 // the current screen ratio is not equal to the last best one
+				 if (MathUtil::FloatsAreEqual(bestRatioDiff, testRatioDiff) == false)
 				 {
-					 if (testResolution.w >= width && testResolution.h >= height &&
-						 testResolution.w <= tmpResolution.w && testResolution.h <= tmpResolution.h)
-					 {
-						 tmpResolution = testResolution;
-					 }
+					// new mode is bigger than game resolution (do not pick different mode that needs downscaling)
+					if ((testResolution.w >= width) && (testResolution.h >= height))
+					{
+						// the ratio fits better
+						if (fabs(testRatioDiff) < fabs(bestRatioDiff))
+						{
+							Game->LOG(0, "New mode better than current (%.2f < %.2f), picking this one!", testRatioDiff, bestRatioDiff);
+
+							bestRatioDiff  = testRatioDiff;
+							bestRatio      = testRatio;
+							bestResolution = testResolution;
+						}
+					}
 				 }
-				 	
 			}
 		}
 	}
-
-	if (current == NULL)
+	else
 	{
-			if (tmpResolution.w == 0) SDL_GetCurrentDisplayMode(0,&tmpResolution);			
-			current = &tmpResolution;
+		Game->LOG(0, "Desktop mode forced!");
 	}
+
+	// this is our resulting mode
+	current = &bestResolution;
 
 	m_RealWidth = current->w;
 	m_RealHeight = current->h;
@@ -261,6 +282,12 @@ HRESULT CBRenderSDL::InitRenderer(int width, int height, bool windowed, float up
 
 	if (vsync == true) SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
 
+#ifdef __ANDROID__
+
+	SDL_SetHint(SDL_HINT_ANDROID_USE_UI_LOW_PROFILE, "1");
+
+#endif
+
 	// m_Renderer = SDL_CreateRenderer(m_Win, -1, SDL_RENDERER_PRESENTVSYNC);
 	m_Renderer = SDL_CreateRenderer(m_Win, -1, 0);
 	if (!m_Renderer) return E_FAIL;
@@ -272,6 +299,7 @@ HRESULT CBRenderSDL::InitRenderer(int width, int height, bool windowed, float up
 		if (!m_Texture) return E_FAIL;
 		SDL_SetTextureBlendMode(m_Texture, SDL_BLENDMODE_BLEND);
 		SDL_SetRenderTarget(m_Renderer, m_Texture);
+		SDL_RenderSetViewport(m_Renderer, NULL);
 
 		m_PixelPerfectTargetRect.x = m_BorderLeft;
 		m_PixelPerfectTargetRect.y = m_BorderTop;
@@ -286,7 +314,7 @@ HRESULT CBRenderSDL::InitRenderer(int width, int height, bool windowed, float up
 	} else {
 		m_RenderOffscreen = false;
 
-		SDL_RenderSetViewport(GetSdlRenderer(), NULL);
+		SDL_RenderSetViewport(m_Renderer, NULL);
 
 		Game->LOG(0, "PixelPerfect rendering disabled!");
 	}
@@ -320,10 +348,11 @@ HRESULT CBRenderSDL::SendRenderingHintSceneComplete()
 	if (m_PixelPerfect == true) {
 		if (m_RenderOffscreen == true) {
 			SDL_SetRenderTarget(m_Renderer, NULL);
+			SDL_RenderSetViewport(m_Renderer, NULL);
 			SDL_RenderCopy(m_Renderer, m_Texture, NULL, &m_PixelPerfectTargetRect);
 
 #ifndef __IPHONEOS__
-			SDL_RenderSetViewport(GetSdlRenderer(), &m_PixelPerfectTargetRect);
+			SDL_RenderSetViewport(m_Renderer, &m_PixelPerfectTargetRect);
 #endif
 
 			m_RenderOffscreen = false;
@@ -460,8 +489,8 @@ HRESULT CBRenderSDL::EraseBackground()
 	// in case of pixelperfect rendering, both on- and offscreen
 	// image need to be erased
 	if (m_PixelPerfect == true) {
-		SDL_RenderSetViewport(GetSdlRenderer(), NULL);
 		SDL_SetRenderTarget(m_Renderer, m_Texture);
+		SDL_RenderSetViewport(m_Renderer, NULL);
 		Fill(0, 0, 0, NULL);
 		m_RenderOffscreen = true;
 	} else {
