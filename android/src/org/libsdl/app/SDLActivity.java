@@ -78,11 +78,12 @@ public class SDLActivity extends Activity {
         	"freeimage",
             "SDL2",
             // "SDL2_image",
-            "SDL2_mixer",
+            // "SDL2_mixer",
             // "SDL2_net",
             // "SDL2_ttf",
-            "effectsprivate",
-            "echo",
+            // "effectsprivate",
+            // "echo",
+            "bass",
             "main"
         };
     }
@@ -90,7 +91,8 @@ public class SDLActivity extends Activity {
     // Load the .so
     public void loadLibraries() {
        for (String lib : getLibraries()) {
-          System.loadLibrary(lib);
+       	       System.out.println("Loading native library: " + lib);
+       	       System.loadLibrary(lib);
        }
     }
     
@@ -126,9 +128,6 @@ public class SDLActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         Log.v("SDL", "onCreate():" + mSingleton);
         super.onCreate(savedInstanceState);
-    }
-
-    protected void onCreateNoDownload() {
 
         SDLActivity.initialize();
 
