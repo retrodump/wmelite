@@ -6,18 +6,20 @@ import java.nio.charset.UnsupportedCharsetException;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Handler;
+import android.os.Environment;
 import android.os.storage.OnObbStateChangeListener;
 import android.os.storage.StorageManager;
 
 import android.app.*;
 
 // import com.purplebrain.adbuddiz.sdk.*;
-
-
 
 public class WMELiteFunctions {
 
@@ -27,6 +29,9 @@ public class WMELiteFunctions {
 	private String obbMountPathOverride;
 	private Handler mainThreadRunHandler;
 	private Activity act;
+	
+	private String appPackageName;
+	private int    appVersionCode;
 	
 	public WMELiteFunctions() {
 		obbMountPathOverride = null;
@@ -47,6 +52,16 @@ public class WMELiteFunctions {
 		// check whether we need the storage manager
 		if (getStorageCallbackRequired() == true)
 		{
+			appPackageName = c.getPackageName();
+			PackageInfo pi;
+			try {
+				pi = c.getPackageManager().getPackageInfo(appPackageName, PackageManager.GET_META_DATA);
+				appVersionCode = pi.versionCode;
+			} catch (NameNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			this.mainThreadRunHandler = mainThreadRunHandler;
 			stMgr = (StorageManager) c.getSystemService(Context.STORAGE_SERVICE);
 			mountListener = new ObbMountListener();
@@ -54,7 +69,7 @@ public class WMELiteFunctions {
 			boolean success = stMgr.mountObb(rawPath, null, mountListener);
 			if (success == false)
 			{
-				System.err.println("Initiaing OBB file mount failed!");
+				System.err.println("Initiating OBB file mount failed!");
 			}
 			return true;
 		}
@@ -95,18 +110,32 @@ public class WMELiteFunctions {
 	public String getGamePackagePath() {
 		// change to fit your needs, maybe to point to the expansion files downloaded from Google play
 		// return Environment.getExternalStorageDirectory().getAbsolutePath();
+		
 		if (obbMountPathOverride != null) {
 			return obbMountPathOverride;
 		}
-		
+
+		/*
+		return "obbmount://" 
+			+ Environment.getExternalStorageDirectory() 
+			+ "/Android/obb/" 
+			+ appPackageName 
+			+ "/" 
+			+ "main." 
+			+ appVersionCode 
+			+ "." 
+			+ appPackageName
+			+ ".obb";
+			*/
+
 		return "/mnt/sdcard/";
 		// return "/mnt/sdcard/demo/";
 	}
 
 	public String getGameFilePath() {
-		// change to fit your needs, maybe to point to the expansion files downloaded from Google play
-		// return Environment.getExternalStorageDirectory().getAbsolutePath();
-		
+		// place the files here that regular WME does not package, i.e. fonts                        
+		//		return "asset://raw";
+
 		return "/mnt/sdcard/";
 		// return "/mnt/sdcard/demo/";
 	}
@@ -114,7 +143,7 @@ public class WMELiteFunctions {
 	public String getFontPath() {
 		if (c != null) {
 			// FIXME is this correct?
-			return c.getPackageResourcePath() + "/assets/files/";
+			return "asset://raw";
 		} else {
 			return ".";
 		}
@@ -125,7 +154,10 @@ public class WMELiteFunctions {
 		// can be placed onto the device using a location
 		// that can be accessed by both wmelite and the user
 		
+		// return "asset://raw";
+
 		return "/mnt/sdcard/";
+		// return "/mnt/sdcard/demo/";
 	}
 	
 	public byte[] getEncodedString(String inputString, String charsetName) {
@@ -171,12 +203,13 @@ public class WMELiteFunctions {
 		return res;
 	}
 	
+	
 	public void showURLInBrowser(String urlToShow)
 	{
 	  Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlToShow));
 	  c.startActivity(myIntent);
 	}
-	
+
 	public class ObbMountListener extends OnObbStateChangeListener
 	{
 		public void onObbStateChange(String path, int state)
@@ -217,4 +250,6 @@ public class WMELiteFunctions {
 		
 		return 0;
 	}
+
 }
+
