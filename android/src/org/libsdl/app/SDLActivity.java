@@ -25,6 +25,7 @@ import android.graphics.*;
 import android.media.*;
 import android.hardware.*;
 
+// import com.purplebrain.adbuddiz.sdk.*;
 
 /**
     SDL Activity
@@ -89,8 +90,13 @@ public class SDLActivity extends Activity {
         super.onCreate(savedInstanceState);
         
         SDLActivity.initialize();
-
-        // So we can call stuff from static callbacks
+        
+// AdBuddiz.setTestModeActive();
+// AdBuddiz.setLogLevel(AdBuddizLogLevel.Info);
+// AdBuddiz.setPublisherKey("TEST_PUBLISHER_KEY");
+// AdBuddiz.cacheAds(this); // this = current Activity
+      
+              // So we can call stuff from static callbacks
         mSingleton = this;
 
         mNeedStorageCallback = wmeLiteFuncs.getStorageCallbackRequired();
@@ -99,6 +105,8 @@ public class SDLActivity extends Activity {
         mSurface = new SDLSurface(getApplication(), mNeedStorageCallback);
 
         wmeLiteFuncs.setContext(getApplicationContext(), mSurface.getMainThreadHandler());
+        
+        wmeLiteFuncs.setActivity(this);
         
         if(Build.VERSION.SDK_INT >= 12) {
             mJoystickHandler = new SDLJoystickHandler_API12();

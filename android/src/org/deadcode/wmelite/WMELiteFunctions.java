@@ -13,6 +13,12 @@ import android.os.Handler;
 import android.os.storage.OnObbStateChangeListener;
 import android.os.storage.StorageManager;
 
+import android.app.*;
+
+// import com.purplebrain.adbuddiz.sdk.*;
+
+
+
 public class WMELiteFunctions {
 
 	private Context c;
@@ -20,6 +26,7 @@ public class WMELiteFunctions {
 	private ObbMountListener mountListener;
 	private String obbMountPathOverride;
 	private Handler mainThreadRunHandler;
+	private Activity act;
 	
 	public WMELiteFunctions() {
 		obbMountPathOverride = null;
@@ -27,6 +34,11 @@ public class WMELiteFunctions {
 	
 	public boolean getStorageCallbackRequired() {
 		return getGamePackagePath().startsWith("obbmount://");
+	}
+	
+	public void setActivity(Activity act)
+	{
+		this.act = act;
 	}
 	
 	public boolean setContext(Context c, Handler mainThreadRunHandler) {
@@ -189,6 +201,9 @@ public class WMELiteFunctions {
 		System.out.println("Query Advertisement SDK to prepare ads/check if ads prepared. Key=" + key + ",number=" + number + ".");
 		
 		// place appropriate code here
+		// if (AdBuddiz.isReadyToShowAd(act)) { // this = current Activity
+		// 	return 1;
+		// }
 		
 		return 0;
 	}
@@ -198,6 +213,7 @@ public class WMELiteFunctions {
 		System.out.println("Instruct Advertisement SDK to show an ad. Key=" + key + ",number=" + number + ".");
 		
 		// place appropriate code here
+		// AdBuddiz.showAd(act);
 		
 		return 0;
 	}

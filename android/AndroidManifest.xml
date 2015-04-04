@@ -32,6 +32,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <!--
+        
+        <activity android:name="com.purplebrain.adbuddiz.sdk.AdBuddizActivity" 
+               android:theme="@android:style/Theme.Translucent" />
+        -->
+               
     </application>
 
     <!-- Android 2.3.3 -->
@@ -42,4 +49,10 @@
 
     <!-- Allow writing to external storage -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> 
+    
+    <!-- <uses-permission android:name="android.permission.INTERNET" /> -->
+
+   <!-- Highly recommended permission to get more ads and revenue -->
+   <!-- <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> -->
+    
 </manifest> 
