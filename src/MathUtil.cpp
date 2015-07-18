@@ -43,3 +43,17 @@ float MathUtil::RoundUp(float val)
 	if (val - result > 0) result += 1.0;
 	return result;
 }
+
+//////////////////////////////////////////////////////////////////////////
+bool  MathUtil::FloatsAreEqual(float val1, float val2)
+{
+	if (fabs(val1 - val2) < 0.001)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+

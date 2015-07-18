@@ -31,6 +31,7 @@ THE SOFTWARE.
 	public:
 		static float Round(float val);
 		static float RoundUp(float val);
+		static bool  FloatsAreEqual(float val1, float val2);
 	};
 
 
