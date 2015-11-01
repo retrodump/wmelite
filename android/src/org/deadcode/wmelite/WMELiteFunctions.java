@@ -38,7 +38,7 @@ public class WMELiteFunctions {
 	}
 	
 	public boolean getStorageCallbackRequired() {
-		return getGamePackagePath().startsWith("obbmount://");
+		return getObbSourcePath() != null;
 	}
 	
 	public void setActivity(Activity act)
@@ -65,7 +65,7 @@ public class WMELiteFunctions {
 			this.mainThreadRunHandler = mainThreadRunHandler;
 			stMgr = (StorageManager) c.getSystemService(Context.STORAGE_SERVICE);
 			mountListener = new ObbMountListener();
-			String rawPath = getGamePackagePath().substring(11);
+			String rawPath = getObbSourcePath().substring(11);
 			boolean success = stMgr.mountObb(rawPath, null, mountListener);
 			if (success == false)
 			{
@@ -83,6 +83,19 @@ public class WMELiteFunctions {
 		nativeInit(c.getAssets());
 	}
 	
+	public void exit() {
+		// check whether we need the storage manager
+		if (getStorageCallbackRequired() == true)
+		{
+			String rawPath = getObbSourcePath().substring(11);
+			boolean success = stMgr.unmountObb(rawPath, false, mountListener);
+			if (success == false)
+			{
+				System.err.println("Initiating OBB file unmount failed!");
+			}
+		}		
+	}
+		
 	private native void nativeInit(AssetManager manager);
 	
 	public String getLogFileDirectory() {
@@ -110,11 +123,24 @@ public class WMELiteFunctions {
 	public String getGamePackagePath() {
 		// change to fit your needs, maybe to point to the expansion files downloaded from Google play
 		// return Environment.getExternalStorageDirectory().getAbsolutePath();
-		
+
+
+		/*		
 		if (obbMountPathOverride != null) {
 			return obbMountPathOverride;
 		}
+		
+		System.out.println("getGamePackagePath() called while OBB not mounted!!! This is probably wrong!");
+		
+		return getObbSourcePath();
+		*/
+		
+		return "/mnt/sdcard/";
+	}
 
+	// return NULL if not using OBB mount (!)
+	private String getObbSourcePath()
+	{
 		/*
 		return "obbmount://" 
 			+ Environment.getExternalStorageDirectory() 
@@ -128,8 +154,7 @@ public class WMELiteFunctions {
 			+ ".obb";
 			*/
 
-		return "/mnt/sdcard/";
-		// return "/mnt/sdcard/demo/";
+		return null;
 	}
 
 	public String getGameFilePath() {
@@ -221,6 +246,11 @@ public class WMELiteFunctions {
 				obbMountPathOverride = "obbmount://" + stMgr.getMountedObbPath(path);
 				System.out.println("Internal OBB mount path: " + obbMountPathOverride);
 				mainThreadRunHandler.sendEmptyMessage(1);
+			}
+			else if ((state == ERROR_NOT_MOUNTED) || (state == UNMOUNTED))
+			{
+				System.out.println("OBB unmount succeeded!");
+				obbMountPathOverride = null;
 			}
 			else
 			{
